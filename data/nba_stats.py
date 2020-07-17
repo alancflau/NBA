@@ -11,7 +11,7 @@ def player_stats(season, stat_type):
     '''
     url = "https://www.basketball-reference.com/leagues/NBA_{}_{}.html".format(season, stat_type)
     html = urlopen(url)
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, features="lxml")
     
     soup.findAll('tr', limit = 2)# use getText()to extract the text we need into a list
     headers = [th.getText() for th in soup.findAll('tr', limit=2)[0].findAll('th')]# exclude the first column as we will not need the ranking order from Basketball Reference for the analysis
