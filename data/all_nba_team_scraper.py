@@ -22,6 +22,33 @@ def name_change(final_df):
     final_df['Players'] = final_df['Players'].replace('Ron Artest', 'Metta World Peace')
     
     return final_df
+
+def all_stars(year):
+    '''
+    Determine players that are all stars for a given year
+    '''
+    df = pd.read_html('https://www.basketball-reference.com/allstar/NBA_{}.html'.format(year))
+    
+    east_players = df[1]
+    west_players = df[2]
+    
+    # lower column names
+    east_players.columns = east_players.columns.get_level_values(1)
+    west_players.columns = west_players.columns.get_level_values(1)
+    
+    # create a dataframe
+    all_stars = pd.DataFrame()
+    
+    players = pd.Series(list(east_players['Starters']) + list(west_players['Starters']))
+    
+    all_stars['Players'] = players
+    all_stars['Season'] = year
+    
+    rows_to_drop = ['Reserves', 'Team Totals']
+    
+    all_stars = all_stars[~all_stars['Players'].isin(rows_to_drop)].dropna()
+    
+    return all_stars
     
 def all_nba_team():
     """
@@ -67,12 +94,6 @@ def all_nba_team():
     return final_df
 
 
-def main():
-    df = all_nba_team()
-    print(df)
-    
-if __name__ == '__main__':
-    main() # this calls your main function
 
     
         
