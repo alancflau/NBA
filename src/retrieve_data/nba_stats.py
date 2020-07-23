@@ -27,13 +27,26 @@ def player_stats(season, stat_type):
 
 
 def player_stats_seasons(season_start, season_end):
+    '''
+    Retrieve player stats between seasons
+    '''
     
     all_dfs = []
-    for year in range(season_start, season_end):
-        df = player_stats(season_start)
-        df['Season'] = season_start
-        all_dfs.append(df)
+    for year in range(season_start, season_end+1):
+        
+        df_per_game = player_stats(year, 'per_game')
+        df_advanced = player_stats(year, 'advanced')
+        df_totals = player_stats(year, 'totals')
+        
+        intersect_cols = df_per_game.columns.intersection(df_advanced.columns).tolist()
+        intersect_cols.remove('MP')
+
+        ex = df_per_game.merge(df_advanced, how = 'left', on = intersect_cols)
+        ex['Season'] = year       
+        combined_df = ex.dropna().reset_index(drop = True)
+
+        all_dfs.append(combined_df)
     
-    result = pd.concat(all_dfs)
+        result = pd.concat(all_dfs)
     
     return result
